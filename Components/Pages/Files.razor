@@ -1,0 +1,140 @@
+﻿@page "/files/{*SubPath}"
+
+@using System.Text.Encodings.Web
+@using Microsoft.AspNetCore.Components.Sections
+@using Microsoft.Extensions.FileProviders
+@using System.Diagnostics.CodeAnalysis
+@using Microsoft.Extensions.FileSystemGlobbing
+
+<nav class="breadcrumbs" aria-label="Path">
+    <ol>
+        @{ var path = ""; }
+        <li><a href="/files/" aria-current="@(SubPath is "/" ? "page" : null)">home</a></li>
+        @if (!string.IsNullOrWhiteSpace(SubPath))
+        {
+            @foreach (var segment in SubPath.Split('/', StringSplitOptions.RemoveEmptyEntries))
+            {
+                path += $"{segment}/";
+                var href = $"/files/{path}";
+                <li>
+                    <a href="@href" aria-current="@(path == SubPath ? "page" : null)">
+                        @segment
+                    </a>
+                </li>
+            }
+        }
+    </ol>
+</nav>
+
+@if (TryGetEntryForPath(SubPath, out var entry) && string.IsNullOrWhiteSpace(entry.Html) is false)
+{
+    <figure>
+        @((MarkupString)entry.Html)
+    </figure>
+}
+
+<ol role="list">
+    @foreach (var file in Entires.Where(f => f.IsDirectory))
+    {
+        <li class="folder">
+            <a href="./@(HtmlEncoder.Default.Encode(file.Name))" class="view">@file.Name/</a>
+        </li>
+    }
+
+    @foreach (var file in Entires.Where(f => !f.IsDirectory))
+    {
+        if (file.PhysicalPath is null)
+        {
+            continue;
+        }
+
+        var price = FilePricer.GetFilePrice(file);
+
+        <li class="flex-row justify-content:space-between">
+
+            <a href="/buy?file=@(Uri.EscapeDataString($"{SubPath}{file.Name}"))" class="margin-end:auto">
+                @file.Name
+            </a>
+
+            @if (price is FilePrice.Free)
+            {
+                <span class="ok color">
+                    Free
+                </span>
+            }
+            @if (price is FilePrice.Paid { Price: var amount })
+            {
+                <span class="info color">
+                    @($"{amount} XMR")
+                </span>
+            }
+        </li>
+    }
+</ol>
+
+@code {
+    [Inject]
+    public required IFilePricer FilePricer { get; init; }
+
+    [Inject]
+    public required IDosieroIndexesProvider IndexesProvider { get; init; }
+
+    [Inject]
+    public required IFileProvider FileProvider { get; init; }
+
+    [CascadingParameter(Name = nameof(Entires))]
+    public required IEnumerable<IFileInfo> Entires { get; init; }
+
+    [Parameter]
+    public required string SubPath
+    {
+        get => field;
+        set => field = string.IsNullOrWhiteSpace(value) ? "/" : value;
+    }
+
+    public bool TryGetEntryForPath(string subPath, [NotNullWhen(true)] out DosieroIndexEntry? found)
+    {
+        found = null;
+
+        var info = FileProvider.GetFileInfo(subPath);
+
+        /* TODO: Avoid sorting this each time */
+        foreach (var index in IndexesProvider.Indexes.OrderByDescending(i => i.SubPath.Length))
+        {
+            if (info.IsDirectory && index.SubPath != subPath)
+            {
+                continue;
+            }
+
+            if (!index.SubPath.StartsWith(subPath))
+            {
+                continue;
+            }
+
+            var relative = subPath[index.SubPath.Length..];
+
+            foreach (var entry in index.Entries.Reverse())
+            {
+                foreach (var setting in entry.FileSettings)
+                {
+                    if (string.IsNullOrWhiteSpace(relative) && setting.Glob is "*" or "**")
+                    {
+                        found = entry;
+                        return true;
+                    }
+
+                    var matcher = new Matcher();
+                    matcher.AddInclude(setting.Glob);
+
+                    if (matcher.Match(relative).HasMatches)
+                    {
+                        found = entry;
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return found is not null;
+    }
+}

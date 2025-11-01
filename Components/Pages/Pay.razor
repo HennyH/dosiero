@@ -1,0 +1,120 @@
+﻿@page "/pay"
+@using System.Text
+@using System.Buffers.Text
+@using Microsoft.Extensions.FileSystemGlobbing
+@using System.Diagnostics.CodeAnalysis
+
+<PageTitle>
+    @Payment.FileName
+</PageTitle>
+
+@if (_hasRecievedPayment is false)
+{
+    <HeadContent>
+        <meta http-equiv="Refresh" content="10" />
+    </HeadContent>
+}
+
+<div class="warn box">
+    <strong class="titlebar">Save This Page</strong>
+    <p>
+        Bookmark this page with <kbd>Ctrl</kbd> + <kbd>D</kbd> (Windows/Linux) or <kbd>⌘</kbd> + <kbd>D</kbd> (Mac) so you can access this purchase again.
+    </p>
+</div>
+
+@if (TryFindEntry(out var entry) && string.IsNullOrWhiteSpace(entry.Html) is false)
+{
+    <figure>
+        <figcaption>
+            <sub-title>Description</sub-title>
+        </figcaption>
+        @((MarkupString)entry.Html)
+    </figure>
+}
+
+@if (_hasRecievedPayment is true)
+{
+    <div class="ok box">
+        <strong class="titlebar">Payment Recieved!</strong>
+        @if (_downloadUrl is not null)
+        {
+            <text>Click <a href="@_downloadUrl">here</a> to download the file.</text>
+        }
+    </div>
+}
+else
+{
+    @_paymentUiHtml
+}
+
+@code {
+    [Inject]
+    public required IPaymentIntegration PaymentIntegration { get; set; }
+
+    [Inject]
+    public required IDosieroIndexesProvider IndexesProvider { get; init; }
+
+    [CascadingParameter(Name = nameof(Payment))]
+    public required IPayment Payment { get; set; }
+
+    private string? _downloadUrl;
+
+    private MarkupString? _paymentUiHtml;
+
+    private bool? _hasRecievedPayment;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _paymentUiHtml = await PaymentIntegration.RenderPaymentUi(Payment);
+        _hasRecievedPayment = await PaymentIntegration.HasPaymentBeenMadeAsync(Payment);
+
+        if (_hasRecievedPayment is true)
+        {
+            var paymentUri = await PaymentIntegration.ToUriAsync(Payment);
+            var paymentUriBase64 = Encoding.UTF8.GetString(Base64Url.EncodeToUtf8(Encoding.UTF8.GetBytes(paymentUri.ToString())));
+            _downloadUrl = $"/download?payment={paymentUriBase64}";
+        }
+
+        await base.OnInitializedAsync();
+    }
+
+    private bool TryFindEntry([NotNullWhen(true)] out DosieroIndexEntry? found)
+    {
+        found = null;
+
+        var root = Path.GetPathRoot(Payment.FileName);
+        var directory = Path.GetDirectoryName(Payment.FileName) ?? string.Empty;
+
+        if (directory == root)
+        {
+            directory = string.Empty;
+        }
+
+        foreach (var index in IndexesProvider.Indexes.OrderByDescending(i => i.SubPath.Length))
+        {
+            if (!index.SubPath.StartsWith(directory))
+            {
+                continue;
+            }
+
+            var relative = Path.GetRelativePath(relativeTo: index.SubPath, Payment.FileName);
+
+            foreach (var entry in index.Entries.Reverse())
+            {
+                foreach (var setting in entry.FileSettings)
+                {
+                    var matcher = new Matcher();
+                    matcher.AddInclude(setting.Glob);
+
+                    if (matcher.Match(relative).HasMatches)
+                    {
+                        found = entry;
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+}

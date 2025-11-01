@@ -1,0 +1,8 @@
+bin/
+obj/
+/packages/
+.idea/
+.vscode/
+.vs/
+*.user
+appsettings.*.json

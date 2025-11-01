@@ -1,0 +1,39 @@
+﻿@using QRCoder
+@using System.Web
+@using System.Drawing
+
+<div class="box">
+    <strong class="titlebar">Payment</strong>
+    <p>
+        To access <span class="mono-font info bg color">@(Payment.FileName)</span> transfer
+        <span class="mono-font plain bg color user-select:all">@(Payment.MoneroPayment.TxAmount)</span> XMR to the following address.
+    </p>
+    <p class="mono-font user-select:all">@Payment.MoneroPayment.Address</p>
+    <a href="@Payment.TransferUri" class="block text-align:center">
+        <text>Open in Wallet</text>
+    </a>
+    <span class="aestheticbreak" />
+    <a href="@Payment.TransferUri" style="min-width: 7cm;">
+        @if (QrCodeSvg is not null)
+        {
+            @QrCodeSvg
+        }
+    </a>
+</div>
+
+
+@code {
+    [Parameter, EditorRequired] public required SignedMoneroPayment Payment { get; set; }
+
+    private MarkupString? QrCodeSvg { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        var generator = new QRCodeGenerator();
+        var data = generator.CreateQrCode(Payment.TransferUri.ToString(), QRCodeGenerator.ECCLevel.Q);
+        var svg = new SvgQRCode(data).GetGraphic(Size.Empty, Color.Black, Color.White, drawQuietZones: true, sizingMode: SvgQRCode.SizingMode.ViewBoxAttribute);
+        QrCodeSvg = new MarkupString(svg);
+
+        base.OnParametersSet();
+    }
+}
