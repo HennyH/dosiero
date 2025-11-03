@@ -3,7 +3,27 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.0.11018.127
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dosiero", "Dosiero.csproj", "{51F50900-AC5A-49CB-B750-8F878E6414DB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dosiero", "src\Dosiero\Dosiero.csproj", "{CCE8D2F5-6656-022F-9FAE-56638CE11E06}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monero.WalletRpc", "src\Monero.WalletRpc\Monero.WalletRpc.csproj", "{2786A3E3-177C-4FC7-A651-B04915F51B3A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dosiero.Integrations.Monero", "src\Dosiero.Integrations.Monero\Dosiero.Integrations.Monero.csproj", "{440C4A05-3695-7F02-5F5B-DAF5923A2F4C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dosiero.FileProviders.FileSystem", "src\Dosiero.FileProviders.FileSystem\Dosiero.FileProviders.FileSystem.csproj", "{D0880959-20A5-4B5C-A9F5-0124786B433D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dosiero.Abstractions.FileProviders", "src\Dosiero.Abstractions.FileProviders\Dosiero.Abstractions.FileProviders.csproj", "{6CE90398-FFC8-45E2-9407-5C8DD4831D74}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dosiero.Abstractions.Payments", "src\Dosiero.Abstractions.Payments\Dosiero.Abstractions.Payments.csproj", "{3899E30A-CF44-4635-AE3B-04B83D9292AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dosiero.UriUtility", "src\Dosiero.UriUtility\Dosiero.UriUtility.csproj", "{027D177A-3BB3-427B-8522-AA681CE50DC4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5F3F6842-E9A7-419B-8356-B671CC8C0CC0}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+		readme.md = readme.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,12 +31,39 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{51F50900-AC5A-49CB-B750-8F878E6414DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{51F50900-AC5A-49CB-B750-8F878E6414DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{51F50900-AC5A-49CB-B750-8F878E6414DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{51F50900-AC5A-49CB-B750-8F878E6414DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCE8D2F5-6656-022F-9FAE-56638CE11E06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCE8D2F5-6656-022F-9FAE-56638CE11E06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCE8D2F5-6656-022F-9FAE-56638CE11E06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCE8D2F5-6656-022F-9FAE-56638CE11E06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2786A3E3-177C-4FC7-A651-B04915F51B3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2786A3E3-177C-4FC7-A651-B04915F51B3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2786A3E3-177C-4FC7-A651-B04915F51B3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2786A3E3-177C-4FC7-A651-B04915F51B3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{440C4A05-3695-7F02-5F5B-DAF5923A2F4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{440C4A05-3695-7F02-5F5B-DAF5923A2F4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{440C4A05-3695-7F02-5F5B-DAF5923A2F4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{440C4A05-3695-7F02-5F5B-DAF5923A2F4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0880959-20A5-4B5C-A9F5-0124786B433D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0880959-20A5-4B5C-A9F5-0124786B433D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0880959-20A5-4B5C-A9F5-0124786B433D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0880959-20A5-4B5C-A9F5-0124786B433D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CE90398-FFC8-45E2-9407-5C8DD4831D74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CE90398-FFC8-45E2-9407-5C8DD4831D74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CE90398-FFC8-45E2-9407-5C8DD4831D74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CE90398-FFC8-45E2-9407-5C8DD4831D74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3899E30A-CF44-4635-AE3B-04B83D9292AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3899E30A-CF44-4635-AE3B-04B83D9292AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3899E30A-CF44-4635-AE3B-04B83D9292AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3899E30A-CF44-4635-AE3B-04B83D9292AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{027D177A-3BB3-427B-8522-AA681CE50DC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{027D177A-3BB3-427B-8522-AA681CE50DC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{027D177A-3BB3-427B-8522-AA681CE50DC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{027D177A-3BB3-427B-8522-AA681CE50DC4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2644FC0D-2893-4B0B-9478-20DBE76722E8}
 	EndGlobalSection
 EndGlobal

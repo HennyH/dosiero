@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+	<OutputType>Library</OutputType>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+	<IsTrimmable>true</IsTrimmable>
+	<EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="QRCoder" Version="1.7.0" />
+    <PackageReference Include="RazorSlices" Version="0.9.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dosiero.Abstractions.Payments\Dosiero.Abstractions.Payments.csproj" />
+    <ProjectReference Include="..\Dosiero.UriUtility\Dosiero.UriUtility.csproj" />
+    <ProjectReference Include="..\Monero.WalletRpc\Monero.WalletRpc.csproj" />
+  </ItemGroup>
+
+</Project>

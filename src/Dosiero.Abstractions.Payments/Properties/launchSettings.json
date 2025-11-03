@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Dosiero.Abstractions.Payments": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:61216;http://localhost:61217"
+    }
+  }
+}

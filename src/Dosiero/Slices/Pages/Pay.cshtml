@@ -1,0 +1,72 @@
+﻿@using Dosiero.Abstractions.FileProviders
+@using Dosiero.Abstractions.Payments
+@using System.Text
+@using System.Buffers.Text
+@using Dosiero
+@using Microsoft.AspNetCore.Html
+
+@inherits RazorSliceHttpResult<IPayment>
+@implements IUsesLayout<MainLayout>
+@inject IPaymentIntegration PaymentIntegration
+@inject IFileReadMeProvider ReadMeProvider
+@inject IFileProvider FileProvider
+
+<main>
+    @{ var hasRecievedPayment = await PaymentIntegration.HasPaymentBeenMadeAsync(Model); }
+
+    @if (hasRecievedPayment is false)
+    {
+        <HeadContent>
+            <meta http-equiv="Refresh" content="10" />
+        </HeadContent>
+    }
+
+    <div class="warn box">
+        <strong class="titlebar">Save This Page</strong>
+        <p>
+            Bookmark this page with <kbd>Ctrl</kbd> + <kbd>D</kbd> (Windows/Linux) or <kbd>⌘</kbd> + <kbd>D</kbd> (Mac) so you can access this purchase again.
+        </p>
+    </div>
+
+    @if (ReadMeProvider.GetFileReadMe(await FileProvider.GetFileInfoAsync(Model.FileUri, CancellationToken)) is { } html)
+    {
+        <div>
+            @html
+        </div>
+    }
+
+    @if (hasRecievedPayment)
+    {
+        var paymentUri = await PaymentIntegration.ToUriAsync(Model);
+        var paymentUriBase64 = Encoding.UTF8.GetString(Base64Url.EncodeToUtf8(Encoding.UTF8.GetBytes(paymentUri.ToString())));
+        var downloadUrl = $"/download?payment={paymentUriBase64}";
+
+        <div class="ok box">
+            <strong class="titlebar">Payment Recieved!</strong>
+            <text>Click <a href="@downloadUrl">here</a> to download the file.</text>
+        </div>
+    }
+    else
+    {
+        @(await PaymentIntegration.RenderPaymentUi(Model))
+    }
+</main>
+
+@functions {
+    protected override async Task ExecuteSectionAsync(string sectionName)
+    {
+        if (sectionName == "head")
+        {
+            var hasRecievedPayment = await PaymentIntegration.HasPaymentBeenMadeAsync(Model);
+
+            if (hasRecievedPayment is false)
+            {
+                <meta http-equiv="refresh" content="10" />
+            }
+
+            <title>Buy - @Model.FileUri.ToString()</title>
+        }
+
+        await base.ExecuteSectionAsync(sectionName);
+    }
+}

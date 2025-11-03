@@ -1,59 +1,81 @@
-﻿# Dosiero
+﻿# ![dosiero-logo](./src/Dosiero/wwwroot/favicon.svg)  Dosiero
 
-That's esperanto for file. This program makes it easy to monetize your files with Monero (XMR).
+A minimalist  *stateless* self-hosted *no-js* pay-to-access file server with Monero payments, designed to be easily extensible.
 
-You point the program to a directory using the `--folder` parameter, and it will search for `index.toml` files.
+![](./images/home.png) ![](./images/browse.png) ![](./images/pay.png) ![](./images/download.png)
 
-```
-/store
-    .dosiero
-    /music
-        /My First Album
+## Usage
 
-            01 - Track 1.mp3
-            02 - Track 2.mp3
+Download one of the pre-built binaries, or clone the repository and run the following command:
+
+```sh
+dotnet publish ./src/Dosiero --output build --self-contained
 ```
 
-```toml
-[[files]]
-name = My First Album
-path = ./music/My First Album
-price = 0.004 XMR
+Then in the `build` folder there will be a `dosiero` executable. Before running you must configure
+the `appsettings.json` file that is in the same directory to suit your needs. Here is an example configuration:
 
-[[files]]
-name = 01 - Track 1.mp3
-path = ./music/My First Album/01 - Track 1.mp3
-price = 0.0005 XMR
+```json
+{
+  "Dosiero": {
+    "ConfigFolder": "C:\\Users\\Henry\\Documents\\store"
+  },
+  "FsFileProvider": {
+    "Path": "C:\\Users\\Henry\\Documents\\store"
+  },
+  "MoneroPayment": {
+    "WalletRpcUri": "https://127.0.0.1:28089"
+  }
+}
 ```
 
-You can browse the directory by visiting `/browse`. When a file is selected you will be taken to `/buy?file=<uuid>`, which will then perform a temporary re-direct to 
+|Section|Setting|Description|Required|
+|--|--|--|--|
+|Dosiero|ConfigFolder|The path within with to search for `*.dosiero` files which are used to configure prices and descriptions for files.|Y|
+|FsFileProvider|Path|The path from which to make files available for download.|Y|
+|MoneroPayment|WalletRpcUri|The URI of the wallet RPC server which should accept payments.|Y|
+|MoneroPayment|WalletRpcUsername|The username to login to the RPC server with.|N|
+|MoneroPayment|WalletRpcPassword|The password to login to the RPC server with.|N|
+|MoneroPayment|AcceptSelfSignedCerts|Whether self-signed certificates should be accepted (defaults to Y).|N|
+
+Within your `ConfigFolder` you can create as many `*.doserio` files as you like. The syntax of the config files is as follows:
+
 ```
-/buy?
-    file=<uuid>
-    &to=monero:<address>?tx_amount=<amount>&tx_description=<name>
-    &expiry=<date>
-    &hash=<hash>
-    [&proof=<txproof>]
+---
+<glob-pattern>[ = <price>]
+---
+[<html>]
 ```
-. The payment screen will then be displayed.
 
-1. If the `hash` does not equal `hash(to)` an error will be displayed.
-2. If payment has been made to `to` in the correct amount a download link will appear as `/download?hash=aK3b...&to=monero:84...84?tx_amount=0.0005&tx_description=My First Album`, clicking this link will allow access to the file.
-3. Otherwise, a QR code is displayed for payment. This page is automatically refreshed every 10s whilst waiting for the payment to be received.
-4. In all cases a button to bookmark the URL is displayed and both a draggable link `<a href="current-page-url" title="..." />` and `"Press Ctrl+D (Windows/Linux) or Cmd+D (Mac) to bookmark this page.`.
+_Note: `<glob-pattern>` is a standard glob pattern, but to match with a directory you must include a trailing `/`._
 
-On start up I scan for all .dosiero files,
-I start a file watcher for .dosiero files
-All parsed files go into a list of nodes by depth
-[
-    [N_a, N_bb]
-    [N_aa, N_ab, ...]
-    ...
-]
+For example, to make all songs 0.01 XMR, but include custom covers for each album you could have the following files:
 
-Then to find the relevant node you search from the lowest depth, these results can be cached
+**.doserio:**
+```
+---
+albums/ = 0.01
+---
+```
 
-(Max(Node Timestamp), Path) => Node?
+**_album1.dosiero:**
+```
+---
+albums/album_1/
+---
 
-/files/...
-/buy?
+<h1>Album 1</h1>
+
+This is a great album, our first one in-fact!
+```
+
+**_album2.dosiero:**
+```
+---
+albums/album_2/ = 0.05
+---
+
+<h1>Album 2</h1>
+
+This album is so great we've hiked the prices. Hope you don't mind.
+```

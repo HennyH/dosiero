@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+		<IsTrimmable>true</IsTrimmable>
+		<PublishAot>true</PublishAot>
+		<PublishTrimmed>true</PublishTrimmed>
+		<AssemblyName>dosiero</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="RazorSlices" Version="0.9.5" />
+      <PackageReference Include="System.IO.Hashing" Version="9.0.10" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Dosiero.Abstractions.Payments\Dosiero.Abstractions.Payments.csproj" />
+      <ProjectReference Include="..\Dosiero.Abstractions.FileProviders\Dosiero.Abstractions.FileProviders.csproj" />
+      <ProjectReference Include="..\Dosiero.FileProviders.FileSystem\Dosiero.FileProviders.FileSystem.csproj" />
+      <ProjectReference Include="..\Dosiero.Integrations.Monero\Dosiero.Integrations.Monero.csproj" />
+      <ProjectReference Include="..\Dosiero.UriUtility\Dosiero.UriUtility.csproj" />
+    </ItemGroup>
+
+</Project>

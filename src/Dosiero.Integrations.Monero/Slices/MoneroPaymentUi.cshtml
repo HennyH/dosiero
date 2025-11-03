@@ -1,0 +1,25 @@
+﻿@inherits RazorSlice<SignedMoneroPayment>
+
+@using QRCoder
+@using System.Drawing
+
+<div class="box">
+    <strong class="titlebar">Payment</strong>
+    <p>
+        To access <span class="mono-font info bg color">@(Model.FileUri.ToString())</span> transfer
+        <span class="mono-font plain bg color user-select:all">@(Model.MoneroPayment.TxAmount)</span> XMR to the following address.
+    </p>
+    <p class="mono-font user-select:all">@Model.MoneroPayment.Address</p>
+    <a href="@Model.TransferUri.ToString()" class="block text-align:center">
+        <text>Open in Wallet</text>
+    </a>
+    <span class="aestheticbreak"></span>
+    @{
+        var generator = new QRCodeGenerator();
+        var data = generator.CreateQrCode(Model.TransferUri.ToString(), QRCodeGenerator.ECCLevel.Q);
+        var svg = new SvgQRCode(data).GetGraphic(Size.Empty, Color.Black, Color.White, drawQuietZones: true, sizingMode: SvgQRCode.SizingMode.ViewBoxAttribute);
+    }
+    <a href="@Model.TransferUri.ToString()" style="min-width: 7cm;">
+        @(new HtmlString(svg))
+    </a>
+</div>

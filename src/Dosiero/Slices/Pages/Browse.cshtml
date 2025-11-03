@@ -1,0 +1,105 @@
+﻿@using Dosiero.Abstractions.FileProviders
+@using Dosiero.Abstractions.Payments
+@using Dosiero
+
+@inherits RazorSliceHttpResult<Uri?>
+@implements IUsesLayout<MainLayout>
+@inject IFileProvider FileProvider
+@inject IFilePricer Pricer
+@inject IFileReadMeProvider ReadMeProvider
+
+@{
+    var file = await FileProvider.GetFileInfoAsync(Model ?? FileProvider.Root, CancellationToken);
+}
+
+<main>
+    <nav class="breadcrumbs" aria-label="Path">
+        <ol>
+            @foreach (var segment in await GetBreadCrumbsPathAsync(file))
+            {
+                var href = $"./?file={Uri.EscapeDataString(segment.Uri.ToString())}";
+                <li>
+                    <a href="@href" aria-current="@(file.Uri == segment.Uri ? "page" : null)">
+                        @segment.Name
+                    </a>
+                </li>
+            }
+        </ol>
+    </nav>
+
+    @if (ReadMeProvider.GetFileReadMe(file) is { } html)
+    {
+        <figure>
+            @html
+        </figure>
+    }
+
+    <ol role="list">
+        @{ var files = await FileProvider.GetDirectoryContentsAsync(file.Uri, CancellationToken); }
+        @foreach (var child in files.Where(f => f.IsDirectory))
+        {
+            <li class="folder">
+                <a href="./?file=@(Uri.EscapeDataString(child.Uri.ToString()))" class="view">@(child.Name)/</a>
+            </li>
+        }
+
+        @foreach (var child in files.Where(f => !f.IsDirectory))
+        {
+            var price = Pricer.GetPrice(child);
+
+            <li class="flex-row justify-content:space-between">
+
+                <a href="/buy?file=@(Uri.EscapeDataString(child.Uri.ToString()))" class="margin-end:auto">
+                    @child.Name
+                </a>
+
+                @if (price is FilePrice.Free)
+                {
+                    <span class="ok color">
+                        Free
+                    </span>
+                }
+                @if (price is FilePrice.Paid { Price: var amount })
+                {
+                    <span class="info color">
+                        @($"{amount} XMR")
+                    </span>
+                }
+            </li>
+        }
+    </ol>
+</main>
+
+@functions {
+    private async Task<IFileInfo[]> GetBreadCrumbsPathAsync(IFileInfo file)
+    {
+        var cursor = file;
+        var root = FileProvider.GetRoot(cursor.Uri);
+        var segments = new Stack<IFileInfo>();
+        while (cursor.Exists && cursor.Uri != root)
+        {
+            segments.Push(cursor);
+            cursor = await FileProvider.GetParentDirectoryInfoAsync(cursor.Uri, CancellationToken);
+        }
+        segments.Push(await FileProvider.GetFileInfoAsync(FileProvider.Root, CancellationToken));
+
+        return [.. segments];
+    }
+
+    protected override async Task ExecuteSectionAsync(string sectionName)
+    {
+        if (sectionName == "head")
+        {
+            if (Model is null)
+            {
+                <title>Browse</title>
+            }
+            else
+            {
+                <title>Browse - @(Model.ToString())</title>
+            }
+        }
+
+        await base.ExecuteSectionAsync(sectionName);
+    }
+}
