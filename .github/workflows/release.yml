@@ -13,32 +13,24 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
         matrix:
-            os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
+            include:
+                - os: windows-latest
+                  rid: win-x64
+                - os: ubuntu-latest
+                  rid: linux-x64
+                - os: macos-latest
+                  rid: osx-arm64
     steps:
-        - name: Checkout
-          uses: actions/checkout@v4
-        - name: Setup .NET
-          uses: actions/setup-dotnet@v4
+        - uses: actions/checkout@v4
+        - uses: actions/setup-dotnet@v4
           with:
             dotnet-version: 10.0.x
-        - name: Restore Dependencies
-          run: dotnet restore
         - name: Publish
-          run: >
-              dotnet publish ./src/Dosiero
-              --self-contained
-              --runtime ${{ matrix.os == 'ubuntu-latest' && 'linux-x64' || matrix.os == 'windows-latest' && 'win-x64' || 'osx-x64' }}
-              --output publish/${{ matrix.os }}
-              /p:DebugType=None
-              /p:DebugSymbols=false
-        - name: Zip (Windows)
-          if: ${{ matrix.os == 'windows-latest' }}
-          run: Compress-Archive -Path "publish/*" -DestinationPath "dosiero-${{ matrix.os }}-${{ github.ref_name }}.zip"
-        - name: Zip (Linux/MacOS)
-          if: ${{ matrix.os != 'windows-latest' }}
-          run: zip -r dosiero-${{ matrix.os }}-${{ github.ref_name }}.zip ./publish/
+          run: dotnet publish ./src/Dosiero --self-contained --runtime ${{ matrix.rid }} --output publish/${{ matrix.os }} /p:DebugType=None /p:DebugSymbols=false
         - name: Release
-          uses: softprops/action-gh-release@v2
+          uses: svenstaro/upload-release-action@v2
           with:
-            files: dosiero-${{ matrix.os }}-${{ github.ref_name }}.zip
-            fail_on_unmatched_files: error
+            file: publish/*
+            tag: ${{ github.ref }}
+            overwrite: true
+            file_glob: true
