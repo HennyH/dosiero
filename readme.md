@@ -2,7 +2,10 @@
 
 A minimalist  *stateless* self-hosted *no-js* pay-to-access file server with Monero payments, designed to be easily extensible.
 
-![](./images/home.png) ![](./images/browse.png) ![](./images/pay.png) ![](./images/download.png)
+<img src="./images/home.png" width="140px" />
+<img src="./images/browse.png" width="140px" />
+<img src="./images/pay.png" width="140px" />
+<img src="./images/download.png" width="140px" />
 
 ## Usage
 
