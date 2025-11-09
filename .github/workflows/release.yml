@@ -1,0 +1,44 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: release
+
+on:
+    push:
+        tags:
+            - "v*"
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+    strategy:
+        matrix:
+            os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - name: Setup .NET
+          uses: actions/setup-dotnet@v4
+          with:
+            dotnet-version: 10.0.x
+        - name: Restore Dependencies
+          run: dotnet restore
+        - name: Publish
+          run: >
+              dotnet publish ./src/Dosiero
+              --self-contained
+              --runtime ${{ matrix.os == 'ubuntu-latest' && 'linux-x64' || matrix.os == 'windows-latest' && 'win-x64' || 'osx-x64' }}
+              --output publish/${{ matrix.os }}
+              /p:DebugType=None
+              /p:DebugSymbols=false
+        - name: Zip (Windows)
+          if: ${{ matrix.os == 'windows-latest' }}
+          run: Compress-Archive -Path "publish/*" -DestinationPath "dosiero-${{ matrix.os }}-${{ github.ref_name }}.zip"
+        - name: Zip (Linux/MacOS)
+          if: ${{ matrix.os != 'windows-latest' }}
+          run: zip -r dosiero-${{ matrix.os }}-${{ github.ref_name }}.zip ./publish/
+        - name: Release
+          uses: softprops/action-gh-release@v2
+          with:
+            files: dosiero-${{ matrix.os }}-${{ github.ref_name }}.zip
+            fail_on_unmatched_files: error
