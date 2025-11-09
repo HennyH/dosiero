@@ -26,11 +26,15 @@ jobs:
           with:
             dotnet-version: 10.0.x
         - name: Publish
-          run: dotnet publish ./src/Dosiero --self-contained --runtime ${{ matrix.rid }} --output publish/${{ matrix.os }} /p:DebugType=None /p:DebugSymbols=false
+          run: dotnet publish ./src/Dosiero --self-contained --runtime ${{ matrix.rid }} --output publish /p:DebugType=None /p:DebugSymbols=false
+        - name: Zip (Windows)
+          if: ${{ matrix.os == 'windows-latest' }}
+          run: Compress-Archive -Path "publish/*" -DestinationPath "dosiero-${{ matrix.os }}-${{ github.ref_name }}.zip"
+        - name: Zip (Linux/MacOS)
+          if: ${{ matrix.os != 'windows-latest' }}
+          run: zip -r dosiero-${{ matrix.os }}-${{ github.ref_name }}.zip ./publish/
         - name: Release
           uses: svenstaro/upload-release-action@v2
           with:
-            file: publish/*
+            file: dosiero-${{ matrix.os }}-${{ github.ref_name }}.zip
             tag: ${{ github.ref }}
-            overwrite: true
-            file_glob: true
