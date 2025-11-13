@@ -6,7 +6,7 @@ using Dosiero.Endpoints;
 
 using Microsoft.Extensions.Options;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateSlimBuilder(args);
 
 var configuration = builder.Configuration;
 
@@ -26,8 +26,7 @@ builder.Services.AddScoped(sp => sp.GetRequiredKeyedService<IPaymentIntegration>
 
 var app = builder.Build();
 
-app.MapStaticAssets().ShortCircuit();
-
+app.UseStaticFiles();
 app.MapBrowseEndpoints();
 app.MapPaymentEndpoints();
 app.MapDownloadEndpoints();
