@@ -22,7 +22,7 @@ public static class ServiceCollectionExtensions
 
                 handler.AcceptSelfSignedCerts(options.AcceptSelfSignedCerts);
 
-                if (options is { Username: { } username, Password: var password })
+                if (options.Login is { Username: var username, Password: var password })
                 {
                     var credentials = new CredentialCache
                     {

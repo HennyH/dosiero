@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Dosiero.Abstractions.FileProviders\Dosiero.Abstractions.FileProviders.csproj" />
+    <ProjectReference Include="..\Dosiero.Configuration\Dosiero.Configuration.csproj" />
   </ItemGroup>
 
 </Project>

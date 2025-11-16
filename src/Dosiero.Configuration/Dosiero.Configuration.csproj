@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<IsTrimmable>true</IsTrimmable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dosiero.Abstractions.FileProviders\Dosiero.Abstractions.FileProviders.csproj" />
+    <ProjectReference Include="..\Dosiero.Abstractions.Payments\Dosiero.Abstractions.Payments.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -3,7 +3,9 @@ using Dosiero.Abstractions.Payments;
 
 namespace Dosiero;
 
-public interface IFilePricer
+internal interface IFilePricer
 {
+    public void SetPrice(LikeString pattern, FilePrice price);
+
     public FilePrice GetPrice(IFileInfo file);
 }

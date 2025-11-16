@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Dosiero.Abstractions.Payments\Dosiero.Abstractions.Payments.csproj" />
+    <ProjectReference Include="..\Dosiero.Configuration\Dosiero.Configuration.csproj" />
     <ProjectReference Include="..\Dosiero.UriUtility\Dosiero.UriUtility.csproj" />
     <ProjectReference Include="..\Monero.WalletRpc\Monero.WalletRpc.csproj" />
   </ItemGroup>

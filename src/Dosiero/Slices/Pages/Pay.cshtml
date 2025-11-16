@@ -8,7 +8,7 @@
 @inherits RazorSliceHttpResult<IPayment>
 @implements IUsesLayout<MainLayout>
 @inject IPaymentIntegration PaymentIntegration
-@inject IFileReadMeProvider ReadMeProvider
+@inject IFileReadmeProvider ReadmeProvider
 @inject IFileProvider FileProvider
 
 <main>
@@ -28,11 +28,15 @@
         </p>
     </div>
 
-    @if (ReadMeProvider.GetFileReadMe(await FileProvider.GetFileInfoAsync(Model.FileUri, CancellationToken)) is { } html)
+    @{
+        var file = await FileProvider.GetFileInfoAsync(Model.FileUri, CancellationToken);
+        var readme = await ReadmeProvider.GetFileReadmeAsync(file, CancellationToken);
+    }
+    @if (readme is not null)
     {
-        <div>
-            @html
-        </div>
+        <figure>
+            @readme
+        </figure>
     }
 
     @if (hasRecievedPayment)

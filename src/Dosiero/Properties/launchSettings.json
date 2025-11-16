@@ -8,7 +8,8 @@
         "applicationUrl": "http://localhost:5243",
         "environmentVariables": {
           "ASPNETCORE_ENVIRONMENT": "Development"
-        }
+        },
+        "commandLineArgs": "/provider fs ~/Documents/store/files /price %.txt 0.05 /readme %.% ~/Documents/store/docs/%1.html /payment monero https://127.0.0.1:28089 --username user --password pass"
       },
       "https": {
         "commandName": "Project",

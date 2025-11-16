@@ -9,78 +9,42 @@ A minimalist  *stateless* self-hosted *no-js* pay-to-access file server with Mon
 <img src="./images/download.png" width="140px" />
 </p>
 
-## Usage
+## Building
 
-Download one of the pre-built binaries, or clone the repository and run the following command:
+Download one of the pre-built binaries from the releases section, or clone the repository and run the following command:
 
 ```sh
 dotnet publish ./src/Dosiero --output build --self-contained
 ```
 
-Then in the `build` folder there will be a `dosiero` executable. Before running you must configure
-the `appsettings.json` file that is in the same directory to suit your needs. Here is an example configuration:
+Then in the `build` folder there will be a `dosiero` executable.
 
-```json
-{
-  "Dosiero": {
-    "ConfigFolder": "C:\\Users\\Henry\\Documents\\store"
-  },
-  "FsFileProvider": {
-    "Path": "C:\\Users\\Henry\\Documents\\store"
-  },
-  "MoneroPayment": {
-    "WalletRpcUri": "https://127.0.0.1:28089"
-  }
-}
+## Running
+
+All configuration is passed in to the program via command line arguments. It is suggested that you create a shell script
+to invoke the program with the desired arguments to avoid typing them out each time.
+
+Powershell:
+
+```ps1
+.\dosiero.exe `
+>> /provider fs ~/Documents/store/files `
+>> /price %.txt 0.01 `
+>> /price %.png 0.05 `
+>> /readme %.% "~/Documents/store/docs/%1.html" `
+>> /payment monero https://127.0.0.1:28089 --username user --password pass
 ```
 
-|Section|Setting|Description|Required|
-|--|--|--|--|
-|Dosiero|ConfigFolder|The path within with to search for `*.dosiero` files which are used to configure prices and descriptions for files.|Y|
-|FsFileProvider|Path|The path from which to make files available for download.|Y|
-|MoneroPayment|WalletRpcUri|The URI of the wallet RPC server which should accept payments.|Y|
-|MoneroPayment|WalletRpcUsername|The username to login to the RPC server with.|N|
-|MoneroPayment|WalletRpcPassword|The password to login to the RPC server with.|N|
-|MoneroPayment|AcceptSelfSignedCerts|Whether self-signed certificates should be accepted (defaults to Y).|N|
-
-Within your `ConfigFolder` you can create as many `*.doserio` files as you like. The syntax of the config files is as follows:
-
-```
----
-<glob-pattern>[ = <price>]
----
-[<html>]
+Bash:
+    
+```sh
+./doserio \
+  /provider fs ~/store/files \
+  /price %.txt 0.01 \
+  /price %.png 0.05 \
+  /readme %.% ~/store/docs/%1.html \
+  /readme %.txt ~/store/docs/%1.txt.html \
+  /payment monero https://127.0.0.1:28089 --username user --password pass
 ```
 
-_Note: `<glob-pattern>` is a standard glob pattern, but to match with a directory you must include a trailing `/`._
-
-For example, to make all songs 0.01 XMR, but include custom covers for each album you could have the following files:
-
-**.doserio:**
-```
----
-albums/ = 0.01
----
-```
-
-**_album1.dosiero:**
-```
----
-albums/album_1/
----
-
-<h1>Album 1</h1>
-
-This is a great album, our first one in-fact!
-```
-
-**_album2.dosiero:**
-```
----
-albums/album_2/ = 0.05
----
-
-<h1>Album 2</h1>
-
-This album is so great we've hiked the prices. Hope you don't mind.
-```
+You can get help by passing `--help` to the end of any command.

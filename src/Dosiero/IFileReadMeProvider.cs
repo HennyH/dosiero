@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Html;
 
 namespace Dosiero;
 
-public interface IFileReadMeProvider
+internal interface IFileReadmeProvider
 {
-    public IHtmlContent? GetFileReadMe(IFileInfo file);
+    public void AddFileReadme(LikeString pattern, string path);
+
+    public ValueTask<IHtmlContent?> GetFileReadmeAsync(IFileInfo file, CancellationToken token = default);
 }

@@ -6,7 +6,7 @@
 @implements IUsesLayout<MainLayout>
 @inject IFileProvider FileProvider
 @inject IFilePricer Pricer
-@inject IFileReadMeProvider ReadMeProvider
+@inject IFileReadmeProvider ReadmeProvider
 
 @{
     var file = await FileProvider.GetFileInfoAsync(Model ?? FileProvider.Root, CancellationToken);
@@ -17,7 +17,9 @@
         <ol>
             @foreach (var segment in await GetBreadCrumbsPathAsync(file))
             {
-                var href = $"./?file={Uri.EscapeDataString(segment.Uri.ToString())}";
+                var href = segment.Uri == FileProvider.Root
+                    ? "./"
+                    : $"./?file={Uri.EscapeDataString(segment.Uri.ToString())}";
                 <li>
                     <a href="@href" aria-current="@(file.Uri == segment.Uri ? "page" : null)">
                         @segment.Name
@@ -27,7 +29,7 @@
         </ol>
     </nav>
 
-    @if (ReadMeProvider.GetFileReadMe(file) is { } html)
+    @if (await ReadmeProvider.GetFileReadmeAsync(file, CancellationToken) is { } html)
     {
         <figure>
             @html
